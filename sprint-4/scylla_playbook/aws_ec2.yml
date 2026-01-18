@@ -1,0 +1,22 @@
+plugin: amazon.aws.aws_ec2
+regions:
+  - ap-south-1
+
+filters:
+  instance-state-name: running
+
+compose:
+  ansible_host: private_ip_address
+
+keyed_groups:
+  - key: tags.scylla
+    prefix: tag_scylla
+  - key: tags.Role
+    prefix: tag_Role
+
+# Optional: bastion proxy settings
+# Ye sirf tab chahiye agar private instances ko bastion ke through access karna ho
+# compose:
+#   ansible_ssh_common_args: >-
+#     -o ProxyCommand="ssh -W %h:%p -q ubuntu@43.204.217.126 -i /home/abhishek/Desktop/bastion.pem"
+

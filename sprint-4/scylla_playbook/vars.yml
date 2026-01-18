@@ -1,0 +1,10 @@
+dependencies:
+  - gnupg
+  - apt-transport-https
+  - software-properties-common
+
+scylla_keyring_path: /etc/apt/keyrings/scylladb.gpg
+scylla_repo_url: http://downloads.scylladb.com/deb/debian/scylla-6.1.list
+scylla_sources_list: /etc/apt/sources.list.d/scylladb.list
+scylla_io_setup_file: /etc/scylla.d/io_properties.yaml
+scylla_service_name: scylla-server

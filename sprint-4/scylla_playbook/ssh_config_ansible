@@ -1,0 +1,14 @@
+# Bastion host
+Host bastion
+    HostName 43.204.217.126
+    User ubuntu
+    IdentityFile /home/abhishek/Desktop/bastion.pem
+    StrictHostKeyChecking no
+
+# Private hosts (e.g., Scylla nodes)
+Host 10.*
+    User ubuntu
+    IdentityFile /home/abhishek/Desktop/bastion.pem
+    StrictHostKeyChecking no
+    ProxyCommand ssh -W %h:%p bastion
+

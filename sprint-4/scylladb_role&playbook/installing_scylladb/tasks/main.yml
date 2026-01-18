@@ -1,0 +1,83 @@
+---
+- name: Set this node's ScyllaDB IP from inventory
+  set_fact:
+    scylla_ip: "{{ private_ip_address }}"
+
+- name: Gather unique ScyllaDB seed node private IPs
+  set_fact:
+    scylla_seed_nodes: "{{ groups['tag_scylla_true'] 
+                           | map('extract', hostvars, 'private_ip_address') 
+                           | join(',') }}"
+
+- name: Debug final seeds list
+  debug:
+    msg: "Final unique scylla_seeds: {{ scylla_seed_nodes }}"
+
+
+
+- name: Ensure dependencies are present
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  loop: "{{ dependencies }}"
+
+- name: Create keyrings directory if not exists
+  ansible.builtin.file:
+    path: "{{ scylla_keyring_path | dirname }}"
+    state: directory
+    mode: "0755"
+
+- name: Import ScyllaDB GPG key
+  ansible.builtin.command: >
+    gpg --homedir /tmp --no-default-keyring
+    --keyring /etc/apt/keyrings/scylladb.gpg
+    --keyserver hkp://keyserver.ubuntu.com:80
+    --recv-keys 491c93b9de7496a7
+  args:
+    creates: /etc/apt/keyrings/scylladb.gpg
+
+- name: Add ScyllaDB APT repository list
+  ansible.builtin.get_url:
+    url: "{{ scylla_repo_url }}"
+    dest: "{{ scylla_sources_list }}"
+    mode: "0644"
+
+- name: Install ScyllaDB
+  ansible.builtin.apt:
+    name: scylla
+    state: present
+    update_cache: yes
+
+- name: Run Scylla I/O setup
+  ansible.builtin.command: scylla_io_setup
+  args:
+    creates: "{{ scylla_io_setup_file }}"
+    
+- name: ScyllaDB configuration template
+  ansible.builtin.template:
+    src: scylla.yml.j2
+    dest: /etc/scylla/scylla.yaml
+    owner: root
+    group: root
+    mode: '0644'
+  notify:
+    - restart scylladb
+
+- name: Configure cassandra-rackdc.properties
+  template:
+    src: cassandra-rackdc.properties.j2
+    dest: /etc/scylla/cassandra-rackdc.properties
+    owner: root
+    group: root
+    mode: '0644'
+  notify:
+    - restart scylladb
+
+
+- name: Ensure ScyllaDB service is running
+  ansible.builtin.service:
+    name: "{{ scylla_service_name }}"
+    state: started
+    enabled: true
+

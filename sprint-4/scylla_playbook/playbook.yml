@@ -1,0 +1,57 @@
+---
+- name: Install and configure ScyllaDB
+  hosts: tag_scylla_true
+  become: true
+  vars_files:
+    - vars.yml
+
+  tasks:
+    - name: Ensure dependencies are present
+      ansible.builtin.apt:
+        name: "{{ item }}"
+        state: present
+        update_cache: yes
+      loop: "{{ dependencies }}"
+
+    - name: Create keyrings directory if not exists
+      ansible.builtin.file:
+        path: "{{ scylla_keyring_path | dirname }}"
+        state: directory
+        mode: "0755"
+
+    - name: Import ScyllaDB GPG key
+      ansible.builtin.command: >
+        gpg --homedir /tmp --no-default-keyring
+        --keyring /etc/apt/keyrings/scylladb.gpg
+        --keyserver hkp://keyserver.ubuntu.com:80
+        --recv-keys 491c93b9de7496a7
+      args:
+        creates: /etc/apt/keyrings/scylladb.gpg
+
+    - name: Add ScyllaDB APT repository list
+      ansible.builtin.get_url:
+        url: "{{ scylla_repo_url }}"
+        dest: "{{ scylla_sources_list }}"
+        mode: "0644"
+
+    - name: Install ScyllaDB
+      ansible.builtin.apt:
+        name: scylla
+        state: present
+        update_cache: yes
+
+    - name: Run Scylla I/O setup
+      ansible.builtin.command: scylla_io_setup
+      args:
+        creates: "{{ scylla_io_setup_file }}"
+
+    - name: Restart ScyllaDB
+      ansible.builtin.service:
+        name: "{{ scylla_service_name }}"
+        state: restarted
+
+    - name: Ensure ScyllaDB service is running
+      ansible.builtin.service:
+        name: "{{ scylla_service_name }}"
+        state: started
+        enabled: true

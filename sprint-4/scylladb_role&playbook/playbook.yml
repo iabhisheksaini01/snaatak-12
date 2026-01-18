@@ -1,0 +1,8 @@
+---
+- name: install scylladb
+  hosts: all
+  become: true
+  gather_facts: yes
+
+  roles: 
+    - installing_scylladb

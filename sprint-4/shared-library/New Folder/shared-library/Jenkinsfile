@@ -1,0 +1,28 @@
+@Library('Shared_Library@SCRUM-368-abhishek') _
+
+pipeline {
+    agent any
+    
+    tools {
+        go 'golang'
+    }
+
+    stages {
+        stage('Run Template') {
+            steps {
+                script {
+                    pipelineTemplate(
+                        binaryName: 'employee-api',
+                        mainFile: 'main.go',
+                        repoUrl: 'https://github.com/Snaatak-Cloudops-Crew/employee-api.git',
+                        branch: 'main',
+                        credentialsId: 'github',
+                        email: 'sainiabhishek619@gmail.com',
+                        slackChannel: '#jenkins-notify'
+                    )
+                }
+            }
+        }
+    }
+}
+

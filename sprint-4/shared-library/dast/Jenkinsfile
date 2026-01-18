@@ -1,0 +1,20 @@
+@Library('Shared_Library@SCRUM-380-abhishek') _
+
+pipeline {
+    agent any
+
+    stages {
+        stage('Run Template') {
+            steps {
+                pipelineTemplate(
+                    repoUrl: 'https://github.com/Snaatak-Cloudops-Crew/salary-api.git',
+                    branch: 'main',
+                    credentialsId: 'github',
+                    email: 'sainiabhishek619@gmail.com',
+                    slackChannel: '#jenkins-notify'
+                )
+            }
+        }
+    }
+}
+

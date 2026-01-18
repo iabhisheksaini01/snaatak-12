@@ -1,0 +1,14 @@
+package org.cloud_ops_crew.Golang
+
+class GoBuild implements Serializable {
+    def script
+
+    GoBuild(script) {
+        this.script = script
+    }
+
+    def compile(String binaryName, String mainFile) {
+        script.sh 'go mod tidy'
+        script.sh "go build -o ${binaryName} ${mainFile}"
+    }
+}

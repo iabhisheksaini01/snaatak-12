@@ -1,0 +1,23 @@
+def jobName     = 'java-unit-testing-job'
+def repoUrl     = 'https://github.com/Snaatak-Cloudops-Crew/CI-Implementation.git'
+def branchName  = 'SCRUM-226-abhishek'
+def scriptPath  = 'Java/Unit-Testing/Declarative-Pipeline/Jenkinsfile'
+def credId      = 'github'
+
+pipelineJob(jobName) {
+    definition {
+        cpsScm {
+            scm {
+                git {
+                    remote {
+                        url(repoUrl)
+                        credentialsId(credId)
+                    }
+                    branches(branchName)
+                }
+            }
+            scriptPath(scriptPath)
+        }
+    }
+}
+

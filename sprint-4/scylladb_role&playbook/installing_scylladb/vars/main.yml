@@ -1,0 +1,14 @@
+---
+
+dependencies:
+  - curl
+  - unzip
+  - openjdk-11-jdk
+
+scylla_version: "6.1"
+scylla_repo_url: "http://downloads.scylladb.com/deb/debian/scylla-{{ scylla_version }}.list"
+scylla_keyring_path: "/etc/apt/keyrings/scylladb.gpg"
+scylla_sources_list: "/etc/apt/sources.list.d/scylla.list"
+scylla_service_name: "scylla-server"
+scylla_io_setup_file: "/etc/scylla.d/io_properties.yaml"
+scylla_endpoint_snitch: "GossipingPropertyFileSnitch"                      

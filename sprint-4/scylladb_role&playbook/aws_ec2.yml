@@ -1,0 +1,18 @@
+plugin: amazon.aws.aws_ec2
+regions:
+  - us-east-2
+
+filters:
+  instance-state-name: running
+
+
+compose:
+  ansible_host: "{{ public_ip_address | default(private_ip_address) }}"
+  ansible_user: ubuntu
+  ansible_ssh_private_key_file: /home/abhishek/Desktop/scylla.pem
+
+
+keyed_groups:
+  - key: tags.scylla
+    prefix: tag_scylla
+

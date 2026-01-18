@@ -1,0 +1,7 @@
+---
+dependencies:
+  - curl
+  - unzip
+  - openjdk-11-jdk
+
+
